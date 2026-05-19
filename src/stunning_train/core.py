@@ -1,5 +1,3 @@
-import curses
-import time
 import io
 class reader:
     def file_stream_gen(self,obj):
@@ -62,4 +60,4 @@ class reader:
         return self.current
 
     def nearby_words(self):
-        return self.history.copy(), self.current.copy(), self.lookahead.copy()
+        return self.history.copy(), self.current, self.lookahead.copy()
