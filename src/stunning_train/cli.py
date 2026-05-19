@@ -56,21 +56,17 @@ def choose_file(stdscr):
 def main(stdscr, args):
     curses.curs_set(0)
     stdscr.keypad(True)
-    text = None
     if args.string is not None:
-        text = args.string
+        r = reader(args.string, wpm=args.wpm)
     elif args.file is not None:
         f = open(args.file, 'r')
-        text = f.read()
-        f.close()
+        r = reader(f, wpm=args.wpm)
     else:
         filename = choose_file(stdscr)
         if filename is None:
             return
         f = open(filename, 'r')
-        text = f.read()
-        f.close()
-    r = reader(text, wpm=args.wpm)
+        r = reader(f, wpm=args.wpm)
     while r.has_next() == True or r.current is not None:
         if r.current is None:
             r.next_word()

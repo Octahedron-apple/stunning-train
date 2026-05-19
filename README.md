@@ -7,7 +7,7 @@ Terminal-based Fast Screen Reader using Rapid Serial Visual Presentation (RSVP).
 Install the package using pip:
 
 ```bash
-pip install .
+pip install stunning-train
 ```
 
 This registers the command-line entrypoint `stt`.
