@@ -35,6 +35,10 @@ class reader:
             raise ValueError("Speed must be greater than 0")
         self.wpm = value
 
+    def get_delay(self):
+        return 60.0 / self.wpm
+
+
     def has_next(self):
         self.fill_lookahead()
         return len(self.lookahead) > 0
