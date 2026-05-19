@@ -9,7 +9,12 @@ class reader:
         self.chunk_size = chunk_size
         if isinstance(stream, str):
             self.stream=iter(stream.split())
+            self.size= len(stream.split())
         elif isinstance(stream, io.IOBase):
+            curr = stream.tell()
+            stream.seek(0, 2)
+            self.size = stream.tell()
+            stream.seek(curr)
             self.stream = self.file_stream_gen(stream)
         else:
             raise TypeError("Stream must be a string or a file-like object")
