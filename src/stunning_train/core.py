@@ -21,6 +21,7 @@ class reader:
         self.history = []
         self.lookahead = []
         self.current = None
+        self.words_read = 0
         self.fill_lookahead()
     def fill_lookahead(self):
         while len(self.lookahead) < self.chunk_size:
@@ -54,6 +55,7 @@ class reader:
             if len(self.history) > self.chunk_size:
                 self.history.pop(0)
         self.current = self.lookahead.pop(0)
+        self.words_read = self.words_read + 1
         self.fill_lookahead()
         return self.current
 
@@ -70,6 +72,9 @@ class reader:
         if self.current is not None:
             self.lookahead.insert(0, self.current)
         self.current = self.history.pop()
+        self.words_read = self.words_read - 1
+        if self.words_read < 0:
+            self.words_read = 0
         return self.current
 
     def nearby_words(self):

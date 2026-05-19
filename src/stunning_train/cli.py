@@ -1,6 +1,7 @@
 import curses
 import time
 import os
+import argparse
 from core import reader
 
 def choose_file(stdscr):
@@ -48,30 +49,36 @@ def choose_file(stdscr):
             chosen_file = files[selected]
             return chosen_file
 
-def main(stdscr):
+def main(stdscr, args):
     curses.curs_set(0)
-    filename = choose_file(stdscr)
-    if filename is None:
-        return
-    f = open(filename, 'r')
-    text = f.read()
-    f.close()
-    r = reader(text)
-    words_read = 0
-    while r.has_next() == True:
+    stdscr.keypad(True)
+    text = None
+    if args.string is not None:
+        text = args.string
+    elif args.file is not None:
+        f = open(args.file, 'r')
+        text = f.read()
+        f.close()
+    else:
+        filename = choose_file(stdscr)
+        if filename is None:
+            return
+        f = open(filename, 'r')
+        text = f.read()
+        f.close()
+    r = reader(text, wpm=args.wpm)
+    while r.has_next() == True or r.current is not None:
+        if r.current is None:
+            r.next_word()
         stdscr.clear()
-        word = r.next_word()
-        words_read = words_read + 1
+        word = r.current
         history_list, current_word, lookahead_list = r.nearby_words()
-        
         history_str = ""
         for h_word in history_list:
             history_str = history_str + h_word + " "
-            
         lookahead_str = ""
         for l_word in lookahead_list:
             lookahead_str = lookahead_str + " " + l_word
-            
         max_y, max_x = stdscr.getmaxyx()
         y = max_y // 2
         word_len = len(word)
@@ -79,29 +86,24 @@ def main(stdscr):
         x = diff_x // 2
         if x < 0:
             x = 0
-            
         hx = x - len(history_str)
         if hx < 0:
             slice_start = len(history_str) - x
             history_str = history_str[slice_start:]
             hx = 0
-            
         lx = x + word_len
         if lx < max_x:
             space_left = max_x - lx
             lookahead_str = lookahead_str[:space_left]
-            
         if len(history_str) > 0:
             stdscr.addstr(y, hx, history_str, curses.A_DIM)
-            
         stdscr.addstr(y, x, word)
-        
         if lx < max_x:
             if len(lookahead_str) > 0:
                 stdscr.addstr(y, lx, lookahead_str, curses.A_DIM)
-
-        
-        pct = words_read / r.size
+        pct = r.words_read / r.size
+        if pct > 1.0:
+            pct = 1.0
         bar_width = 20
         filled = int(pct * bar_width)
         empty = bar_width - filled
@@ -121,13 +123,31 @@ def main(stdscr):
         bar_y = max_y - 2
         if bar_y > y:
             stdscr.addstr(bar_y, bar_x, full_str)
-            
         stdscr.refresh()
-        delay = r.get_delay()
-        time.sleep(delay)
-
-
+        delay_ms = int(r.get_delay() * 1000)
+        stdscr.timeout(delay_ms)
+        key = stdscr.getch()
+        if key == curses.KEY_RIGHT:
+            steps = int(r.size * 0.02)
+            if steps < 1:
+                steps = 1
+            r.skip_forward(steps)
+        elif key == curses.KEY_LEFT:
+            steps = int(r.size * 0.02)
+            if steps < 1:
+                steps = 1
+            for _ in range(steps):
+                r.go_backward()
+        else:
+            if r.has_next() == True:
+                r.next_word()
+            else:
+                break
 
 if __name__ == "__main__":
-    curses.wrapper(main)
-
+    parser = argparse.ArgumentParser(description="Terminal-based Fast Screen Reader ")
+    parser.add_argument('-f', '--file', type=str, help="File Path(needed if file is outside the cwd)")
+    parser.add_argument('-s', '--string', type=str, help="Input String")
+    parser.add_argument('-w', '--wpm', type=int, default=300, help="SET WPM(default: 300)")
+    args = parser.parse_args()
+    curses.wrapper(main, args)
