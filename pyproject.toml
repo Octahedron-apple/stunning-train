@@ -13,7 +13,7 @@ classifiers = [
 dependencies = []
 
 [project.scripts]
-stunning-train = "stunning_train.cli:run"
+stt = "stunning_train.cli:run"
 
 [tool.setuptools.packages.find]
 where = ["src"]
