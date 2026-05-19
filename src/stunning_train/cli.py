@@ -57,9 +57,11 @@ def main(stdscr):
     text = f.read()
     f.close()
     r = reader(text)
+    words_read = 0
     while r.has_next() == True:
         stdscr.clear()
         word = r.next_word()
+        words_read = words_read + 1
         max_y, max_x = stdscr.getmaxyx()
         y = max_y // 2
         word_len = len(word)
@@ -68,9 +70,32 @@ def main(stdscr):
         if x < 0:
             x = 0
         stdscr.addstr(y, x, word)
+        
+        pct = words_read / r.size
+        bar_width = 20
+        filled = int(pct * bar_width)
+        empty = bar_width - filled
+        bar_str = "["
+        for _ in range(filled):
+            bar_str = bar_str + "#"
+        for _ in range(empty):
+            bar_str = bar_str + " "
+        bar_str = bar_str + "]"
+        percent_num = int(pct * 100)
+        percent_str = " " + str(percent_num) + "%"
+        full_str = bar_str + percent_str
+        bar_len = len(full_str)
+        bar_x = (max_x - bar_len) // 2
+        if bar_x < 0:
+            bar_x = 0
+        bar_y = max_y - 2
+        if bar_y > y:
+            stdscr.addstr(bar_y, bar_x, full_str)
+            
         stdscr.refresh()
         delay = r.get_delay()
         time.sleep(delay)
+
 
 
 if __name__ == "__main__":
