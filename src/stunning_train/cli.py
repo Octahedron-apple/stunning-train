@@ -1,8 +1,12 @@
+#!/usr/bin/env python3
 import curses
 import time
 import os
 import argparse
-from core import reader
+try:
+    from stunning_train.core import reader
+except ImportError:
+    from core import reader
 
 def choose_file(stdscr):
     all_items = os.listdir('.')
@@ -144,10 +148,13 @@ def main(stdscr, args):
             else:
                 break
 
-if __name__ == "__main__":
+def run():
     parser = argparse.ArgumentParser(description="Terminal-based Fast Screen Reader ")
     parser.add_argument('-f', '--file', type=str, help="File Path(needed if file is outside the cwd)")
     parser.add_argument('-s', '--string', type=str, help="Input String")
     parser.add_argument('-w', '--wpm', type=int, default=300, help="SET WPM(default: 300)")
     args = parser.parse_args()
     curses.wrapper(main, args)
+
+if __name__ == "__main__":
+    run()
