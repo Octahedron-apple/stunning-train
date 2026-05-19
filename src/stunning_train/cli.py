@@ -62,6 +62,16 @@ def main(stdscr):
         stdscr.clear()
         word = r.next_word()
         words_read = words_read + 1
+        history_list, current_word, lookahead_list = r.nearby_words()
+        
+        history_str = ""
+        for h_word in history_list:
+            history_str = history_str + h_word + " "
+            
+        lookahead_str = ""
+        for l_word in lookahead_list:
+            lookahead_str = lookahead_str + " " + l_word
+            
         max_y, max_x = stdscr.getmaxyx()
         y = max_y // 2
         word_len = len(word)
@@ -69,7 +79,27 @@ def main(stdscr):
         x = diff_x // 2
         if x < 0:
             x = 0
+            
+        hx = x - len(history_str)
+        if hx < 0:
+            slice_start = len(history_str) - x
+            history_str = history_str[slice_start:]
+            hx = 0
+            
+        lx = x + word_len
+        if lx < max_x:
+            space_left = max_x - lx
+            lookahead_str = lookahead_str[:space_left]
+            
+        if len(history_str) > 0:
+            stdscr.addstr(y, hx, history_str, curses.A_DIM)
+            
         stdscr.addstr(y, x, word)
+        
+        if lx < max_x:
+            if len(lookahead_str) > 0:
+                stdscr.addstr(y, lx, lookahead_str, curses.A_DIM)
+
         
         pct = words_read / r.size
         bar_width = 20
