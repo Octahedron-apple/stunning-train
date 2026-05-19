@@ -15,13 +15,25 @@ def choose_file(stdscr):
     num_files = len(files)
     while True:
         stdscr.clear()
+        max_y, max_x = stdscr.getmaxyx()
+        start_y = (max_y - num_files) // 2
+        if start_y < 0:
+            start_y = 0
         for idx in range(num_files):
             filename = files[idx]
             if idx == selected:
                 prefix = "> "
             else:
                 prefix = "  "
-            stdscr.addstr(idx, 0, prefix + filename)
+            line = prefix + filename
+            line_len = len(line)
+            diff_x = max_x - line_len
+            x = diff_x // 2
+            if x < 0:
+                x = 0
+            y = start_y + idx
+            stdscr.addstr(y, x, line)
+
         stdscr.refresh()
         key = stdscr.getch()
         if key == curses.KEY_UP:
@@ -37,6 +49,7 @@ def choose_file(stdscr):
             return chosen_file
 
 def main(stdscr):
+    curses.curs_set(0)
     filename = choose_file(stdscr)
     if filename is None:
         return
@@ -47,10 +60,18 @@ def main(stdscr):
     while r.has_next() == True:
         stdscr.clear()
         word = r.next_word()
-        stdscr.addstr(0, 0, word)
+        max_y, max_x = stdscr.getmaxyx()
+        y = max_y // 2
+        word_len = len(word)
+        diff_x = max_x - word_len
+        x = diff_x // 2
+        if x < 0:
+            x = 0
+        stdscr.addstr(y, x, word)
         stdscr.refresh()
         delay = r.get_delay()
         time.sleep(delay)
+
 
 if __name__ == "__main__":
     curses.wrapper(main)
