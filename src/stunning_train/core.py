@@ -64,5 +64,13 @@ class reader:
             self.next_word()
         return self.current
 
+    def go_backward(self):
+        if len(self.history) == 0:
+            return self.current
+        if self.current is not None:
+            self.lookahead.insert(0, self.current)
+        self.current = self.history.pop()
+        return self.current
+
     def nearby_words(self):
         return self.history.copy(), self.current, self.lookahead.copy()

@@ -107,7 +107,7 @@ def main(stdscr):
         empty = bar_width - filled
         bar_str = "["
         for _ in range(filled):
-            bar_str = bar_str + "#"
+            bar_str = bar_str + "-"
         for _ in range(empty):
             bar_str = bar_str + " "
         bar_str = bar_str + "]"
