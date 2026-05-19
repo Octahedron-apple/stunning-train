@@ -18,4 +18,44 @@ class reader:
         self.history = []
         self.lookahead = []
         self.current = None
-        
+        self.fill_lookahead()
+    def fill_lookahead(self):
+        while len(self.lookahead) < self.chunk_size:
+            try:
+                word = next(self.stream)
+                self.lookahead.append(word)
+            except StopIteration:
+                break
+
+    def get_speed(self):
+        return self.wpm
+
+    def set_speed(self, value):
+        if value <= 0:
+            raise ValueError("Speed must be greater than 0")
+        self.wpm = value
+
+    def has_next(self):
+        self.fill_lookahead()
+        return len(self.lookahead) > 0
+
+    def next_word(self):
+        if not self.has_next():
+            raise StopIteration()
+        if self.current is not None:
+            self.history.append(self.current)
+            if len(self.history) > self.chunk_size:
+                self.history.pop(0)
+        self.current = self.lookahead.pop(0)
+        self.fill_lookahead()
+        return self.current
+
+    def skip_forward(self, n=1):
+        for _ in range(n):
+            if not self.has_next():
+                break
+            self.next_word()
+        return self.current
+
+    def nearby_words(self):
+        return self.history.copy(), self.current.copy(), self.lookahead.copy()
