@@ -103,7 +103,7 @@ def main(stdscr, args):
         if lx < max_x:
             if len(lookahead_str) > 0:
                 stdscr.addstr(y, lx, lookahead_str, curses.A_DIM)
-        pct = r.words_read / r.size
+        pct = (r.chars_read / r.size) if r.size > 0 else 1.0
         if pct > 1.0:
             pct = 1.0
         bar_width = 20
@@ -135,13 +135,13 @@ def main(stdscr, args):
         stdscr.timeout(delay_ms)
         key = stdscr.getch()
         if key == curses.KEY_RIGHT:
-            steps = int(r.size * 0.02)
+            steps = int((r.size / 6) * 0.02)
             if steps < 1:
                 steps = 1
             r.skip_forward(steps)
             last_time = time.time()
         elif key == curses.KEY_LEFT:
-            steps = int(r.size * 0.02)
+            steps = int((r.size / 6) * 0.02)
             if steps < 1:
                 steps = 1
             for _ in range(steps):

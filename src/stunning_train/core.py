@@ -9,7 +9,7 @@ class reader:
         self.chunk_size = chunk_size
         if isinstance(stream, str):
             self.stream=iter(stream.split())
-            self.size= len(stream.split())
+            self.size= len(stream)
         elif isinstance(stream, io.IOBase):
             curr = stream.tell()
             stream.seek(0, 2)
@@ -22,6 +22,7 @@ class reader:
         self.lookahead = []
         self.current = None
         self.words_read = 0
+        self.chars_read = 0
         self.fill_lookahead()
     def fill_lookahead(self):
         while len(self.lookahead) < self.chunk_size:
@@ -56,6 +57,7 @@ class reader:
                 self.history.pop(0)
         self.current = self.lookahead.pop(0)
         self.words_read = self.words_read + 1
+        self.chars_read = self.chars_read + len(self.current) + 1
         self.fill_lookahead()
         return self.current
 
@@ -71,10 +73,13 @@ class reader:
             return self.current
         if self.current is not None:
             self.lookahead.insert(0, self.current)
+            self.chars_read = self.chars_read - (len(self.current) + 1)
         self.current = self.history.pop()
         self.words_read = self.words_read - 1
         if self.words_read < 0:
             self.words_read = 0
+        if self.chars_read < 0:
+            self.chars_read = 0
         return self.current
 
     def nearby_words(self):
