@@ -41,7 +41,10 @@ class reader:
         self.wpm = value
 
     def get_delay(self):
-        return 60.0 / self.wpm
+        base_delay = 60.0 / self.wpm
+        if self.current:
+            return base_delay * (len(self.current) / 5.0)
+        return base_delay
 
 
     def has_next(self):
