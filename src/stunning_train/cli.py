@@ -67,9 +67,11 @@ def main(stdscr, args):
             return
         f = open(filename, 'r')
         r = reader(f, wpm=args.wpm)
+    last_time = time.time()
     while r.has_next() == True or r.current is not None:
         if r.current is None:
             r.next_word()
+            last_time = time.time()
         stdscr.clear()
         word = r.current
         history_list, current_word, lookahead_list = r.nearby_words()
@@ -124,7 +126,12 @@ def main(stdscr, args):
         if bar_y > y:
             stdscr.addstr(bar_y, bar_x, full_str)
         stdscr.refresh()
-        delay_ms = int(r.get_delay() * 1000)
+        now = time.time()
+        elapsed = now - last_time
+        remaining = r.get_delay() - elapsed
+        if remaining < 0:
+            remaining = 0
+        delay_ms = int(remaining * 1000)
         stdscr.timeout(delay_ms)
         key = stdscr.getch()
         if key == curses.KEY_RIGHT:
@@ -132,15 +139,18 @@ def main(stdscr, args):
             if steps < 1:
                 steps = 1
             r.skip_forward(steps)
+            last_time = time.time()
         elif key == curses.KEY_LEFT:
             steps = int(r.size * 0.02)
             if steps < 1:
                 steps = 1
             for _ in range(steps):
                 r.go_backward()
-        else:
+            last_time = time.time()
+        elif key == -1:
             if r.has_next() == True:
                 r.next_word()
+                last_time = time.time()
             else:
                 break
 
