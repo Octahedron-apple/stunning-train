@@ -7,7 +7,7 @@ class reader:
                 yield word
     
     def pdf_stream_gen(self, obj):
-        for i, page in enumerate(obj.reader.pages):
+        for i, page in enumerate(obj.get_pages()):
             self.current_page = i + 1
             text = page.extract_text()
             if text:
@@ -30,7 +30,7 @@ class reader:
         elif isinstance(stream, pdf_reader):
             self.is_pdf = True
             self.stream = self.pdf_stream_gen(stream)
-            self.size = len(stream.reader.pages)
+            self.size = stream.get_page_count()
         else:
             raise TypeError("Stream must be a string, file-like object, or pdf_reader")
         self.history = []
