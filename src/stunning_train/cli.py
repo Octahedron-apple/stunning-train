@@ -5,8 +5,10 @@ import os
 import argparse
 try:
     from stunning_train.core import reader
+    from stunning_train.pdf import pdf_reader
 except ImportError:
     from core import reader
+    from pdf import pdf_reader
 
 def choose_file(stdscr):
     all_items = os.listdir('.')
@@ -59,13 +61,19 @@ def main(stdscr, args):
     if args.string is not None:
         r = reader(args.string, wpm=args.wpm)
     elif args.file is not None:
-        f = open(args.file, 'r')
+        if args.file.lower().endswith('.pdf'):
+            f = pdf_reader(args.file)
+        else:
+            f = open(args.file, 'r')
         r = reader(f, wpm=args.wpm)
     else:
         filename = choose_file(stdscr)
         if filename is None:
             return
-        f = open(filename, 'r')
+        if filename.lower().endswith('.pdf'):
+            f = pdf_reader(filename)
+        else:
+            f = open(filename, 'r')
         r = reader(f, wpm=args.wpm)
     last_time = time.time()
     while r.has_next() == True or r.current is not None:
@@ -103,7 +111,10 @@ def main(stdscr, args):
         if lx < max_x:
             if len(lookahead_str) > 0:
                 stdscr.addstr(y, lx, lookahead_str, curses.A_DIM)
-        pct = (r.chars_read / r.size) if r.size > 0 else 1.0
+        if getattr(r, 'is_pdf', False):
+            pct = (r.current_page / r.size) if r.size > 0 else 1.0
+        else:
+            pct = (r.chars_read / r.size) if r.size > 0 else 1.0
         if pct > 1.0:
             pct = 1.0
         bar_width = 20

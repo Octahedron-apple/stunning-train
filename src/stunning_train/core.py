@@ -1,12 +1,23 @@
 import io
+from .pdf import pdf_reader
 class reader:
     def file_stream_gen(self,obj):
         for line in obj:
             for word in line.split():
                 yield word
+    
+    def pdf_stream_gen(self, obj):
+        for i, page in enumerate(obj.reader.pages):
+            self.current_page = i + 1
+            text = page.extract_text()
+            if text:
+                for word in text.split():
+                    yield word
     def __init__(self, stream, wpm=300, chunk_size= 5):
         self.wpm= wpm
         self.chunk_size = chunk_size
+        self.is_pdf = False
+        self.current_page = 0
         if isinstance(stream, str):
             self.stream=iter(stream.split())
             self.size= len(stream)
@@ -16,8 +27,12 @@ class reader:
             self.size = stream.tell()
             stream.seek(curr)
             self.stream = self.file_stream_gen(stream)
+        elif isinstance(stream, pdf_reader):
+            self.is_pdf = True
+            self.stream = self.pdf_stream_gen(stream)
+            self.size = len(stream.reader.pages)
         else:
-            raise TypeError("Stream must be a string or a file-like object")
+            raise TypeError("Stream must be a string, file-like object, or pdf_reader")
         self.history = []
         self.lookahead = []
         self.current = None
