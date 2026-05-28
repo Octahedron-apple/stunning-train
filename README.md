@@ -39,7 +39,7 @@ During reading:
 - **Left Arrow**: Seek backward by 2% of the text.
 - **Right Arrow**: Seek forward by 2% of the text.
 
-## Python API
+## Python API🔭 I’m currently working on making a basic chat with PDF application.
 
 You can also use the core reading state engine directly in Python:
 
@@ -54,3 +54,4 @@ while r.has_next():
     word = r.next_word()
     print(word)
 ```
+Note:- Currently only supports unix like systems, due to using curses, for use on windows install windows-curses
