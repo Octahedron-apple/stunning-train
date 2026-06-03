@@ -38,8 +38,9 @@ stt -f path/to/file.txt -w 400
 During reading:
 - **Left Arrow**: Seek backward by 2% of the text.
 - **Right Arrow**: Seek forward by 2% of the text.
+- **Spacebar**: Pause/Resume the reading.
 
-## Python API🔭 I’m currently working on making a basic chat with PDF application.
+## Python API
 
 You can also use the core reading state engine directly in Python:
 

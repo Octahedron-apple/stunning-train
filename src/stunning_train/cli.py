@@ -76,6 +76,7 @@ def main(stdscr, args):
             f = open(filename, 'r')
         r = reader(f, wpm=args.wpm)
     last_time = time.time()
+    paused = False
     while r.has_next() == True or r.current is not None:
         if r.current is None:
             r.next_word()
@@ -129,6 +130,8 @@ def main(stdscr, args):
         percent_num = int(pct * 100)
         percent_str = " " + str(percent_num) + "%"
         full_str = bar_str + percent_str
+        if paused:
+            full_str += " [PAUSED]"
         bar_len = len(full_str)
         bar_x = (max_x - bar_len) // 2
         if bar_x < 0:
@@ -158,12 +161,18 @@ def main(stdscr, args):
             for _ in range(steps):
                 r.go_backward()
             last_time = time.time()
+        elif key == ord(' '):
+            paused = not paused
+            last_time = time.time()
         elif key == -1:
-            if r.has_next() == True:
-                r.next_word()
-                last_time = time.time()
+            if not paused:
+                if r.has_next() == True:
+                    r.next_word()
+                    last_time = time.time()
+                else:
+                    break
             else:
-                break
+                last_time = time.time()
 
 def run():
     parser = argparse.ArgumentParser(description="Terminal-based Fast Screen Reader ")
