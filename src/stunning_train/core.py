@@ -78,14 +78,12 @@ class reader:
         self.chars_read = self.chars_read + len(self.current) + 1
         self.fill_lookahead()
         return self.current
-
     def skip_forward(self, n=1):
         for _ in range(n):
             if not self.has_next():
                 break
             self.next_word()
         return self.current
-
     def go_backward(self):
         if len(self.history) == 0:
             return self.current
@@ -99,7 +97,6 @@ class reader:
         if self.chars_read < 0:
             self.chars_read = 0
         return self.current
-
     def nearby_words(self):
         return self.history.copy(), self.current, self.lookahead.copy()
     def get_orp(self, word):
