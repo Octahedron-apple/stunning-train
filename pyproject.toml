@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "stunning-train"
-version = "0.1.1"
+version = "0.2.0"
 description = "A terminal-based Rapid Serial Visual Presentation (RSVP) fast screen reader."
 readme = "README.md"
 requires-python = ">=3.7"
