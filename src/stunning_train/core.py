@@ -102,3 +102,15 @@ class reader:
 
     def nearby_words(self):
         return self.history.copy(), self.current, self.lookahead.copy()
+    def get_orp(self, word):
+        if not word:
+            return 0
+        length = len(word)
+        if length <= 3:
+            return 0
+        elif length <= 5:
+            return 1
+        elif length <= 9:
+            return 2
+        else:
+            return 3

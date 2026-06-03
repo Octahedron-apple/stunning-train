@@ -4,3 +4,5 @@ a.txt
 *.pyc
 *.pyo
 *.pyd
+
+.agent/
